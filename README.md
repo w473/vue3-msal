@@ -7,9 +7,9 @@ The vue-msal library enables client-side [vue](https://vuejs.org/) applications,
 ## Installation
 Add the `vue3-msal` dependency to your project using yarn or npm.
 ```shell script
-npm install vue-msal
+npm install vue3-msal
 or
-yarn add vue-msal
+yarn add vue3-msal
 ```
 
 #### Vue Usage

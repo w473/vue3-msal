@@ -1,11 +1,11 @@
-# vue-msal
+# vue3-msal
 
 #### Wrapper of [MSAL.js](https://github.com/AzureAD/microsoft-authentication-library-for-js#readme) (*Microsoft Authentication Library*) for usage in Vue.
 
 The vue-msal library enables client-side [vue](https://vuejs.org/) applications, running in a web browser, to authenticate users using [Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-overview) work and school accounts (AAD), Microsoft personal accounts (MSA) and social identity providers like Facebook, Google, LinkedIn, Microsoft accounts, etc. through [Azure AD B2C](https://docs.microsoft.com/en-us/azure/active-directory-b2c/active-directory-b2c-overview#identity-providers) service. It also enables your app to access [Microsoft Cloud](https://www.microsoft.com/enterprise) services such as [Microsoft Graph](https://graph.microsoft.io/).
 
 ## Installation
-Add the `vue-msal` dependency to your project using yarn or npm.
+Add the `vue3-msal` dependency to your project using yarn or npm.
 ```shell script
 npm install vue-msal
 or
@@ -15,24 +15,20 @@ yarn add vue-msal
 #### Vue Usage
 Use the plugin in your vue instance like this
 ```js
-import msal from 'vue-msal'
+import msal from 'vue3-msal'
 
-Vue.use(msal, {
+app.use(msal, {
     auth: {
       clientId: '<YOUR CLIENT ID HERE>'
     }
 });
 
-new Vue({
-  //... vue options
-})
 ```
 
 #### Nuxt Usage
 Add a new javascript file like `msal.js` under `/plugins/` directory with the following content
 > :grey_exclamation: *Note: you should add Vue as a second argument to the constructor if you want to add the global mixin automatically with the `framework.globalMixin` option. Check the [mixin](#mixin) section below for more information*
 ```js
-import Vue from 'vue' //import Vue if you want to use the framework.globalMixin option
 import MSAL from 'vue-msal'
 
 export default ({ app, error, $axios }, inject) => {
@@ -41,7 +37,7 @@ export default ({ app, error, $axios }, inject) => {
       auth: {
         clientId: '<YOUR CLIENT ID HERE>'
       }
-    }, Vue /* [optional] should be passed as an argument if you want to the framework.globalMixin option*/
+    }, app /* [optional] should be passed as an argument if you want to the framework.globalMixin option*/
   ))
 }
 
@@ -131,7 +127,7 @@ So for example you can do this:
 
 <script>
 //Importing the mixin locally (omit the following line if you are using the 'framework.globalMixin' option)
-import { msalMixin } from 'vue-msal'; 
+import { msalMixin } from 'vue3-msal'; 
 
 new Vue({
     el: '#demo',
@@ -268,7 +264,7 @@ We offer two methods of storage for Msal, `localStorage` and `sessionStorage`. O
 ## Configuration Options
 Configuration options are organized into groups like this
 ```js
-Vue.use(msal, {
+app.use(msal, {
     auth: { //Group
         clientId: '<YOUR CLIENT ID HERE>', //Option 1
         tenantId: '<YOUR TENANT ID HERE>', //Option 2

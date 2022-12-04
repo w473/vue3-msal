@@ -1,6 +1,6 @@
 {
   "name": "vue3-msal",
-  "version": "3.2.0",
+  "version": "3.2.5",
   "description": "Vue plugin for using Microsoft Authentication Library (MSAL)",
   "main": "dist/plugin.js",
   "scripts": {
@@ -19,12 +19,8 @@
     "url": "https://github.com/procosgroup/vue3-msal/issues"
   },
   "contributors": [
-    {
-      "name": "Marios Vertopoulos"
-    },
-    {
-      "name": "Bart Vanderschoot"
-    }
+    "Marios Vertopoulos",
+    "Bart Vanderschoot"
   ],
   "eslintIgnore": [
     "lib/*.*"
@@ -46,5 +42,8 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.138"
+  },
+  "directories": {
+    "lib": "lib"
   }
 }

@@ -1,5 +1,5 @@
 'use strict';
-import { ref, reactive } from 'vue'
+import { reactive } from 'vue'
 import { Options, MSALBasic } from './src/types';
 import { MSAL } from './src/main';
 import { mixin } from "./mixin";
@@ -12,7 +12,7 @@ export const msalPlugin = {
         if (options.framework && options.framework.globalMixin) {
             app.mixin(mixin);
         }
-        const msalBasic: MSALBasic = reactive({
+        const exposed: MSALBasic = reactive({
             data: msal.data,
             signIn() { msal.signIn(); },
             async signOut() { await msal.signOut(); },
@@ -22,6 +22,8 @@ export const msalPlugin = {
             saveCustomData(key: string, data: any) { msal.saveCustomData(key, data); }
         })
 
-        app.config.globalProperties.$msal = msalBasic
+        app.config.globalProperties.$msal = exposed
+
+        return exposed;
     }
 }

@@ -12,7 +12,7 @@ export const msalPlugin = {
         if (options.framework && options.framework.globalMixin) {
             app.mixin(mixin);
         }
-        const exposed: MSALBasic = reactive({
+        const msalBasic: MSALBasic = reactive({
             data: msal.data,
             signIn() { msal.signIn(); },
             async signOut() { await msal.signOut(); },
@@ -22,8 +22,8 @@ export const msalPlugin = {
             saveCustomData(key: string, data: any) { msal.saveCustomData(key, data); }
         })
 
-        app.config.globalProperties.$msal = exposed
-
-        return exposed;
+        app.config.globalProperties.$msal = msalBasic
+        app.config.globalProperties.msal = msal.data
+ 
     }
 }

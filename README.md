@@ -15,9 +15,9 @@ yarn add vue3-msal
 #### Vue Usage
 Use the plugin in your vue instance like this
 ```js
-import msal from 'vue3-msal'
+import { msalPlugin } from 'vue3-msal'
 
-app.use(msal, {
+app.use(msalPlugin, {
     auth: {
       clientId: '<YOUR CLIENT ID HERE>'
     }

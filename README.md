@@ -347,4 +347,4 @@ globalMixin | `boolean` | Setting this to `true` will add a mixin with the `msal
 
 [MIT License](./LICENSE)
 
-Copyright (c) Marios Vertopoulos
+Copyright (c) Bart Vanderschoot

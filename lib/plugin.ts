@@ -23,7 +23,7 @@ export const msalPlugin = {
         })
 
         app.config.globalProperties.$msal = msalBasic
-        app.config.globalProperties.msal = msal.data
+        app.config.globalProperties.msal = reactive(msal.data)
  
     }
 }

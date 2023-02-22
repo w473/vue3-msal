@@ -1,9 +1,9 @@
-import msal from "msal";
-import conf from "msal/lib-commonjs/Configuration";
+import msal from "@azure/msal-browser";
+import conf from "@azure/msal-browser/dist/config/Configuration";
 import { AxiosRequestConfig } from "axios";
 
 export type AuthError = msal.AuthError;
-export type AuthResponse = msal.AuthResponse;
+export type AuthResponse = msal.AuthenticationResult;
 
 export type Auth = {
     clientId: string,
@@ -22,6 +22,7 @@ export type Auth = {
 }
 
 export type Request = {
+    account?: object,
     scopes?: string[]
 }
 
@@ -38,7 +39,7 @@ export type Graph = {
 }
 
 export type CacheOptions = conf.CacheOptions;
-export type SystemOptions = conf.SystemOptions;
+export type SystemOptions = conf.BrowserSystemOptions;
 export type FrameworkOptions = {
     globalMixin?: boolean
 }

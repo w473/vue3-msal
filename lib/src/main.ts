@@ -70,9 +70,9 @@ export class MSAL implements MSALBasic {
             auth: {
                 clientId: this.auth.clientId,
                 authority: this.auth.authority || `https://${this.auth.tenantName}/${this.auth.tenantId}`,
-                validateAuthority: this.auth.validateAuthority,
-                redirectUri: this.auth.redirectUri,
-                postLogoutRedirectUri: this.auth.postLogoutRedirectUri,
+                // validateAuthority: this.auth.validateAuthority,
+                redirectUri: this.auth.redirectUri as string,
+                postLogoutRedirectUri: this.auth.postLogoutRedirectUri as string,
                 navigateToLoginRequestUrl: this.auth.navigateToLoginRequestUrl
             },
             cache: this.cache,
@@ -82,20 +82,24 @@ export class MSAL implements MSALBasic {
         this.getSavedCallbacks();
         this.executeCallbacks();
         // Register Callbacks for redirect flow
-        this.lib.handleRedirectCallback((error: AuthError, response: AuthResponse) => {
-            if (!this.isAuthenticated()) {
-                this.saveCallback('auth.onAuthentication', error, response);
+        this.lib.handleRedirectPromise().then((response: AuthResponse) => {
+            if (response) { //!this.isAuthenticated()
+                this.handleTokenResponse(null, response);
+                this.saveCallback('auth.onAuthentication', null, response);
             } else {
                 this.acquireToken();
             }
+        }).catch((error: AuthError) => {
+            this.acquireToken();
+            this.saveCallback('auth.onAuthentication', error, null);
         });
 
         if (this.auth.requireAuthOnInitialize) {
-            this.signIn()
+            this.signIn();
         }
         this.data.isAuthenticated = this.isAuthenticated();
         if (this.data.isAuthenticated) {
-            this.data.user = this.lib.getAccount();
+            this.data.user = this.getAccount();
             this.acquireToken().then(() => {
                 if (this.graph.callAfterInit) {
                     this.initialMSGraphCall();
@@ -104,8 +108,15 @@ export class MSAL implements MSALBasic {
         }
         this.getStoredCustomData();
     }
+    getAccount() {
+        if (this.lib.getAllAccounts().length > 0) {
+            return this.lib.getAllAccounts()[0]
+        } else {
+            return null
+        }        
+    }
     signIn() {
-        if (!this.lib.isCallback(window.location.hash) && !this.lib.getAccount()) {
+        if (!this.getAccount()) { // !this.lib.isCallback(window.location.hash) &&
             // request can be used for login or token request, however in more complex situations this can have diverging options
             this.lib.loginRedirect(this.request);
         }
@@ -117,17 +128,18 @@ export class MSAL implements MSALBasic {
         this.lib.logout();
     }
     isAuthenticated() {
-        return !this.lib.isCallback(window.location.hash) && !!this.lib.getAccount();
+        return !!this.getAccount(); //  !this.lib.isCallback(window.location.hash) &&
     }
     async acquireToken(request = this.request, retries = 0) {
         try {
             //Always start with acquireTokenSilent to obtain a token in the signed in user from cache
-            const response = await this.lib.acquireTokenSilent(request);
+            const response = this.data.user && Object.keys(this.data.user).length > 0 ? 
+                await this.lib.acquireTokenSilent({...request, account: this.data.user}) : await this.lib.acquireTokenSilent(request);
             this.handleTokenResponse(null, response);
             return response;
-        } catch (error) {
+        } catch (error: any) {
             // Upon acquireTokenSilent failure (due to consent or interaction or login required ONLY)
-            // Call acquireTokenRedirect
+            // Call acquireTokenRedirect         
             if (this.requiresInteraction(error.errorCode)) {
                 this.lib.acquireTokenRedirect(request);
             } else if(retries > 0) {
@@ -138,6 +150,7 @@ export class MSAL implements MSALBasic {
                     }, 60 * 1000);
                 })
             }
+            console.log(error)
             return false;
         }
     }
@@ -147,12 +160,12 @@ export class MSAL implements MSALBasic {
             return;
         }
         let setCallback = false;
-        if(response.tokenType === 'access_token' && this.data.accessToken !== response.accessToken) {
+        if(this.data.accessToken !== response.accessToken) {
             this.setToken('accessToken', response.accessToken, response.expiresOn, response.scopes);
             setCallback = true;
         }
-        if(this.data.idToken !== response.idToken.rawIdToken) {
-            this.setToken('idToken', response.idToken.rawIdToken, new Date(response.idToken.expiration * 1000), [this.auth.clientId]);
+        if(this.data.idToken !== response.idToken) { // .rawIdToken new Date(response.idToken.expiration * 1000)
+            this.setToken('idToken', response.idToken, response.expiresOn, [this.auth.clientId]);
             setCallback = true;
         }
         if(setCallback) {
@@ -392,7 +405,12 @@ export class MSAL implements MSALBasic {
                     });
                     this.storeCallbackQueue();
                 } catch (e) {
-                    console.warn(`Callback '${cb.id}' failed with error: `, e.message);
+                    // const { message } = e as Object
+                    if (e instanceof Error) {
+                        const errorMessage = e.message;
+                        console.warn(`Callback '${cb.id}' failed with error: `, errorMessage);
+                    }
+                   
                 }
             }
         }

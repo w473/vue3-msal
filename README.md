@@ -1,8 +1,10 @@
 # vue3-msal
 
-#### Wrapper of [MSAL.js](https://github.com/AzureAD/microsoft-authentication-library-for-js#readme) (*Microsoft Authentication Library*) for usage in Vue.
+#### Wrapper of [msal-browser.js](https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser#readme) (*Microsoft Authentication Library*) for usage in Vue3.
 
-The vue-msal library enables client-side [vue](https://vuejs.org/) applications, running in a web browser, to authenticate users using [Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-overview) work and school accounts (AAD), Microsoft personal accounts (MSA) and social identity providers like Facebook, Google, LinkedIn, Microsoft accounts, etc. through [Azure AD B2C](https://docs.microsoft.com/en-us/azure/active-directory-b2c/active-directory-b2c-overview#identity-providers) service. It also enables your app to access [Microsoft Cloud](https://www.microsoft.com/enterprise) services such as [Microsoft Graph](https://graph.microsoft.io/).
+The library has been upgraded to use msal-browser, solving issues like third-party cookie problem.
+
+The vue3-msal library enables client-side [vue](https://vuejs.org/) applications, running in a web browser, to authenticate users using [Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-overview) work and school accounts (AAD), Microsoft personal accounts (MSA) and social identity providers like Facebook, Google, LinkedIn, Microsoft accounts, etc. through [Azure AD B2C](https://docs.microsoft.com/en-us/azure/active-directory-b2c/active-directory-b2c-overview#identity-providers) service. It also enables your app to access [Microsoft Cloud](https://www.microsoft.com/enterprise) services such as [Microsoft Graph](https://graph.microsoft.io/).
 
 ## Installation
 Add the `vue3-msal` dependency to your project using yarn or npm.

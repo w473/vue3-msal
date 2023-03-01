@@ -4,7 +4,9 @@
   "description": "Vue plugin for using Microsoft Authentication Library (MSAL)",
   "main": "dist/plugin.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
   },
   "keywords": [
     "vue",
@@ -42,7 +44,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",
-    "@types/lodash": "^4.14.138"
+    "@types/lodash": "^4.14.138",
+    "typescript": "^4.5.5"
   },
   "directories": {
     "lib": "lib"

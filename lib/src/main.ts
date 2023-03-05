@@ -20,14 +20,14 @@ import {
 export class MSAL implements MSALBasic {
     private lib: any;
     private tokenExpirationTimers: {[key: string]: undefined | number} = {};
-    public data: DataObject = {
+    public data = <DataObject>({
         isAuthenticated: false,
         accessToken: '',
         idToken: '',
         user: {},
         graph: {},
         custom: {}
-    };
+    });
     public callbackQueue: CallbackQueueObject[] = [];
     private readonly auth: Auth = {
         clientId: '',
@@ -87,6 +87,10 @@ export class MSAL implements MSALBasic {
             if (response) { //!this.isAuthenticated()
                 this.handleTokenResponse(null, response);
                 this.saveCallback('auth.onAuthentication', null, response);
+                this.data.isAuthenticated = this.isAuthenticated();
+                if(this.data.isAuthenticated){
+                    this.data.user = this.getAccount();
+                }
             } else {
                 this.acquireToken();
             }
@@ -114,7 +118,7 @@ export class MSAL implements MSALBasic {
             return this.lib.getAllAccounts()[0]
         } else {
             return null
-        }        
+        }
     }
     signIn() {
         if (!this.getAccount()) { // !this.lib.isCallback(window.location.hash) &&
@@ -134,13 +138,13 @@ export class MSAL implements MSALBasic {
     async acquireToken(request = this.request, retries = 0) {
         try {
             //Always start with acquireTokenSilent to obtain a token in the signed in user from cache
-            const response = this.data.user && Object.keys(this.data.user).length > 0 ? 
+            const response = this.data.user && Object.keys(this.data.user).length > 0 ?
                 await this.lib.acquireTokenSilent({...request, account: this.data.user}) : await this.lib.acquireTokenSilent(request);
             this.handleTokenResponse(null, response);
             return response;
         } catch (error: any) {
             // Upon acquireTokenSilent failure (due to consent or interaction or login required ONLY)
-            // Call acquireTokenRedirect         
+            // Call acquireTokenRedirect
             if (this.requiresInteraction(error.errorCode)) {
                 this.lib.acquireTokenRedirect(request);
             } else if(retries > 0) {
@@ -151,7 +155,6 @@ export class MSAL implements MSALBasic {
                     }, 60 * 1000);
                 })
             }
-            console.log(error)
             return false;
         }
     }
@@ -166,16 +169,18 @@ export class MSAL implements MSALBasic {
             setCallback = true;
         }
         if(this.data.idToken !== response.idToken) { // .rawIdToken new Date(response.idToken.expiration * 1000)
-            this.setToken('idToken', response.idToken, response.expiresOn, [this.auth.clientId]);
+            const expiresOn =  response.expiresOn ?? response.idTokenClaims.exp;
+            this.setToken('idToken', response.idToken,expiresOn, [this.auth.clientId]);
             setCallback = true;
         }
         if(setCallback) {
             this.saveCallback('auth.onToken', null, response);
         }
     }
-    private setToken(tokenType:string, token: string, expiresOn: Date, scopes: string[]) {
+    private setToken(tokenType:string, token: string, expiresOn: Date|number, scopes: string[]) {
         const expirationOffset = this.lib.config.system.tokenRenewalOffsetSeconds * 1000;
-        const expiration = expiresOn.getTime() - (new Date()).getTime() - expirationOffset;
+        const expireOnTime = (Number.isInteger(expiresOn) ? <number>expiresOn * 1000 : (<Date>expiresOn).getTime());
+        const expiration = expireOnTime - (new Date()).getTime() - expirationOffset;
         if (expiration >= 0) {
             this.data[tokenType] = token;
         }
@@ -411,7 +416,6 @@ export class MSAL implements MSALBasic {
                         const errorMessage = e.message;
                         console.warn(`Callback '${cb.id}' failed with error: `, errorMessage);
                     }
-                   
                 }
             }
         }
